@@ -38,6 +38,11 @@ spec:
               secretKeyRef:
                 name: auth-env
                 key: supertokensCoreUrl
+          - name: SUPER_TOKENS_CORE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: apiKey
           - name: GOOGLE_CLIENT_ID
             valueFrom:
               secretKeyRef:

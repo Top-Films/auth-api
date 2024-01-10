@@ -20,7 +20,8 @@ export const websiteDomain: string = process.env.FRONTEND_URL ?? 'http://localho
 
 export const SuperTokensConfig: TypeInput = {
 	supertokens: {
-		connectionURI: superTokensCoreUrl
+		connectionURI: superTokensCoreUrl,
+		apiKey: process.env.SUPER_TOKENS_CORE_API_KEY
 	},
 	appInfo: {
 		appName: applicationName,
