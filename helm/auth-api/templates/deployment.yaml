@@ -17,6 +17,57 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: FRONTEND_URL
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: frontendUrl
+          - name: AUTHENTICATION_API_URL
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: authApiUrl
+          - name: AUTHENTICATION_API_PORT
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: authApiPort
+          - name: SUPER_TOKENS_CORE_URL
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: supertokensCoreUrl
+          - name: GOOGLE_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: googleClientId
+          - name: GOOGLE_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: googleClientSecret
+          - name: GITHUB_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: githubClientId
+          - name: GITHUB_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: githubClientSecret
+          - name: DISCORD_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: discordClientId
+          - name: DISCORD_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: auth-env
+                key: discordClientSecret
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
