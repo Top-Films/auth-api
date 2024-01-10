@@ -40,7 +40,7 @@ jobs:
   build_test:
     needs: whitelist_runner
     runs-on: ubuntu-latest
-    name: Build Test and Deploy Application
+    name: Build and Test Application
     steps:
     - name: Checkout Branch
       uses: actions/checkout@v3
@@ -59,12 +59,12 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}
-        path: ${{ dist }}
+        path: dist
 
   deploy:
     needs: [whitelist_runner, build_test]
     runs-on: ubuntu-latest
-    name: Build Test and Deploy Application
+    name: Upload Artifacts and Deploy Application
     steps:
     - name: Checkout Branch
       uses: actions/checkout@v3
