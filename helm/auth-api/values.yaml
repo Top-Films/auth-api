@@ -4,6 +4,62 @@ image:
   repository: maxmorhardt/topfilms-auth-api
   tag: '1.0.0'
   pullPolicy: Always
+  env:
+    - name: FRONTEND_URL
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: frontendUrl
+    - name: AUTHENTICATION_API_URL
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: authApiUrl
+    - name: AUTHENTICATION_API_PORT
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: authApiPort
+    - name: SUPER_TOKENS_CORE_URL
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: supertokensCoreUrl
+    - name: SUPER_TOKENS_CORE_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: supertokensCoreUrlApiKey
+    - name: GOOGLE_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: googleClientId
+    - name: GOOGLE_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: googleClientSecret
+    - name: GITHUB_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: githubClientId
+    - name: GITHUB_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: githubClientSecret
+    - name: DISCORD_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: discordClientId
+    - name: DISCORD_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: discordClientSecret
 
 service:
   type: ClusterIP
