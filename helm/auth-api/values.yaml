@@ -1,5 +1,3 @@
-replicaCount: 1
-
 image:
   repository: maxmorhardt/topfilms-auth-api
   tag: '1.0.0'

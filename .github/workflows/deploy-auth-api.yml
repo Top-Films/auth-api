@@ -49,6 +49,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '20.10.0'
+    - run: npm version ${{ env.APP_VERSION }} || true
     - run: npm install
     - run: npm run test
     - run: npm run build
