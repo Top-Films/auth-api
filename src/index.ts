@@ -21,8 +21,11 @@ const discordProviderId: string = 'discord';
 
 const apiDomain: string = process.env.AUTHENTICATION_API_URL ?? 'http://localhost:3001';
 const superTokensCoreUrl: string = process.env.SUPER_TOKENS_CORE_URL ?? 'http://localhost:3567';
-
 const websiteDomain: string = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+
+console.log(`Auth API Domain: ${apiDomain}`);
+console.log(`Super Tokens Domain: ${superTokensCoreUrl}`);
+console.log(`Frontend Domain: ${websiteDomain}`);
 
 const SuperTokensConfig: TypeInput = {
 	supertokens: {
