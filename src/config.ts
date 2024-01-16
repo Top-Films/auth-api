@@ -67,7 +67,9 @@ export const SuperTokensConfig: TypeInput = {
 
 			]
 		}),
-		Session.init(),
+		Session.init({
+			getTokenTransferMethod: () => 'header'
+		}),
 		Dashboard.init(),
 		UserRoles.init()
 	]

@@ -45,9 +45,6 @@ jobs:
     - name: Checkout Branch
       uses: actions/checkout@v3
 
-    - name: Add Environment File
-      run: echo {{ secrets.ENV_PROD }} > .env
-
     - name: Build Application
       uses: actions/setup-node@v3
       with:

@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "Express API for Top Films Authentication",
   "author": "Max Morhardt",
-  "license": "ISC",
   "main": "dist/index.js",
   "scripts": {
     "start": "node ./dist/index.js",
     "build": "tsup ./src",
-    "test": "echo",
+    "test": "echo TODO",
     "dev": "tsup src/index.ts --watch --onSuccess \"node dist/index.js\""
   },
   "dependencies": {
