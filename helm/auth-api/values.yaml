@@ -38,16 +38,16 @@ image:
         secretKeyRef:
           name: auth-env
           key: googleClientSecret
-    - name: GITHUB_CLIENT_ID
+    - name: TWITTER_CLIENT_ID
       valueFrom:
         secretKeyRef:
           name: auth-env
-          key: githubClientId
-    - name: GITHUB_CLIENT_SECRET
+          key: twitterClientId
+    - name: TWITTER_CLIENT_SECRET
       valueFrom:
         secretKeyRef:
           name: auth-env
-          key: githubClientSecret
+          key: twitterClientSecret
     - name: DISCORD_CLIENT_ID
       valueFrom:
         secretKeyRef:

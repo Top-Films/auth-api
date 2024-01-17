@@ -15,18 +15,22 @@ dotenv.config();
 /* Configuration */
 const applicationName = 'Top Films';
 
+// Third party provider ids
 const googleProviderId: string = 'google';
-const githubProviderId: string = 'github';
+const twitterProviderId: string = 'twitter';
 const discordProviderId: string = 'discord';
 
+// Domains based on env
 const apiDomain: string = process.env.AUTHENTICATION_API_URL ?? 'http://localhost:3001';
 const superTokensCoreUrl: string = process.env.SUPER_TOKENS_CORE_URL ?? 'http://localhost:3567';
 const websiteDomain: string = process.env.FRONTEND_URL ?? 'http://localhost:3000';
 
+// Debug logs for env
 console.log(`Auth API Domain: ${apiDomain}`);
 console.log(`Super Tokens Domain: ${superTokensCoreUrl}`);
 console.log(`Frontend Domain: ${websiteDomain}`);
 
+// Configuration for super tokens
 const SuperTokensConfig: TypeInput = {
 	supertokens: {
 		connectionURI: superTokensCoreUrl,
@@ -53,11 +57,11 @@ const SuperTokensConfig: TypeInput = {
 				},
 				{
 					config: {
-						thirdPartyId: githubProviderId,
+						thirdPartyId: twitterProviderId,
 						clients: [
 							{
-								clientId: process.env.GITHUB_CLIENT_ID ?? '',
-								clientSecret: process.env.GITHUB_CLIENT_SECRET ?? ''
+								clientId: process.env.TWITTER_CLIENT_ID ?? '',
+								clientSecret: process.env.TWITTER_CLIENT_SECRET ?? ''
 							}
 						]
 					}
@@ -76,6 +80,7 @@ const SuperTokensConfig: TypeInput = {
 
 			]
 		}),
+		// Use bearer token instead of cookies
 		Session.init({
 			getTokenTransferMethod: () => 'header'
 		}),
@@ -84,6 +89,7 @@ const SuperTokensConfig: TypeInput = {
 	]
 };
 
+// Initialize super tokens
 supertokens.init(SuperTokensConfig);
 
 /* API */
@@ -91,6 +97,7 @@ const port: number = process.env.AUTHENTICATION_API_PORT as number | undefined ?
 const host: string = '0.0.0.0';
 const app = express();
 
+// Cors settings
 app.use(
 	cors({
 		origin: websiteDomain, 
