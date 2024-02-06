@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import Dashboard from 'supertokens-node/recipe/dashboard';
 import Session from 'supertokens-node/recipe/session';
 import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
-import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { TypeInput } from 'supertokens-node/types';
 
@@ -76,7 +75,6 @@ export const SuperTokensConfig: TypeInput = {
 			getTokenTransferMethod: () => 'header'
 		}),
 		Dashboard.init(),
-		UserRoles.init(),
-		UserMetadata.init()
+		UserRoles.init()
 	]
 };
