@@ -27,7 +27,7 @@ image:
       valueFrom:
         secretKeyRef:
           name: auth-env
-          key: supertokensCoreUrlApiKey
+          key: supertokensCoreApiKey
     - name: GOOGLE_CLIENT_ID
       valueFrom:
         secretKeyRef:
