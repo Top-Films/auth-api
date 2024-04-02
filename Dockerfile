@@ -1,4 +1,4 @@
-FROM node:20.10.0-alpine
+FROM --platform=linux/arm64 node:20.12.0-alpine as build
 
 USER root
 

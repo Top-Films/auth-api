@@ -67,17 +67,15 @@ service:
 ingress:
   enabled: true
   className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt"
   hosts:
-    - host: auth.topfilms.co
+    - host: auth.topfilms.io
       paths:
         - path: /
           pathType: Prefix
   tls: 
-   - secretName: auth-api-cert
+   - secretName: auth.topfilms.io-tls
      hosts:
-       - auth.topfilms.co
+       - auth.topfilms.io
 
 resources:
   limits:
