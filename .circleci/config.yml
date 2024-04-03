@@ -44,7 +44,8 @@ jobs:
       
       - run: 
           name: Set version
-          command: npm version $APP_VERSION
+          command: npm version $APP_VERSION --no-git-tag-version
+
 
       - run:
           name: Run tests
