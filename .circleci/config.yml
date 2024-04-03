@@ -103,7 +103,7 @@ jobs:
 
       - run:
           name: Helm package
-          command: helm package helm/$APP_NAME
+          command: helm package helm/$APP_NAME --app-version=$APP_VERSION --version=$APP_VERSION
 
       - run:
           name: Helm artifact push
@@ -111,7 +111,7 @@ jobs:
 
       - run:
           name: Helm deploy
-          command: helm upgrade $APP_NAME ./$APP_NAME-$APP_VERSION.tgz --install --atomic --debug --history-max=3 -n topfilms
+          command: helm upgrade $APP_NAME ./$APP_NAME-$APP_VERSION.tgz --install --atomic --debug --history-max=3 -n topfilms --set image.tag=$APP_VERSION
       
 
 workflows:
