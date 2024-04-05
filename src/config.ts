@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import supertokens from 'supertokens-node';
 import Dashboard from 'supertokens-node/recipe/dashboard';
 import Session from 'supertokens-node/recipe/session';
 import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
@@ -19,6 +20,9 @@ const discordProviderId: string = 'discord';
 export const websiteDomain: string = process.env.FRONTEND_URL ?? 'http://localhost:3000';
 export const apiDomain: string = process.env.AUTHENTICATION_API_URL ?? 'http://localhost:3001';
 export const superTokensCoreUrl: string = process.env.SUPER_TOKENS_CORE_URL ?? 'http://localhost:3567';
+
+// Error message for duplicate third party emails
+const dubplicateEmailErrorMessage: string = 'Cannot sign up as email already exists';
 
 // Configuration for super tokens
 export const SuperTokensConfig: TypeInput = {
@@ -68,7 +72,68 @@ export const SuperTokensConfig: TypeInput = {
 					}
 				}
 
-			]
+			],
+			override: {
+				// No duplicate emails
+				functions(originalImplementation) {
+					return {
+						...originalImplementation,
+						async emailPasswordSignUp(input) {
+							const existingUsers = await supertokens.listUsersByAccountInfo(input.tenantId, {
+								email: input.email
+							});
+							if (existingUsers.length === 0) {
+								// This email is new so we allow sign up
+								return originalImplementation.emailPasswordSignUp(input);
+							}
+
+							return {
+								status: 'EMAIL_ALREADY_EXISTS_ERROR'
+							};
+						},
+						async thirdPartySignInUp(input) {
+							const existingUsers = await supertokens.listUsersByAccountInfo(input.tenantId, {
+								email: input.email
+							});
+							if (existingUsers.length === 0) {
+								// This email is new so we allow sign up
+								return originalImplementation.thirdPartySignInUp(input);
+							}
+
+							if (existingUsers.find(u =>
+								u.loginMethods.find(lM => lM.hasSameThirdPartyInfoAs({
+									id: input.thirdPartyId,
+									userId: input.thirdPartyUserId
+								}) && lM.recipeId === 'thirdparty') !== undefined)) {
+								// This means we are trying to sign in with the same social login. So we allow it
+								return originalImplementation.thirdPartySignInUp(input);
+							}
+
+							// The email already exists with another social or email password login method, so we throw an error.
+							throw new Error(dubplicateEmailErrorMessage);
+						}
+					};
+				},
+				apis(originalImplementation) {
+					return {
+						...originalImplementation,
+						async thirdPartySignInUpPOST(input) {
+							try {
+								return await originalImplementation.thirdPartySignInUpPOST!(input);
+							} catch (err: unknown) {
+								if (err instanceof Error && err.message === dubplicateEmailErrorMessage) {
+									return {
+										status: 'GENERAL_ERROR',
+										message: 'Seems like you already have an account with another method. Please use that instead.'
+									};
+								}
+
+								throw err;
+							}
+						}
+					};
+				}
+			}
 		}),
 		// Use bearer token instead of cookies
 		Session.init({
