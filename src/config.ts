@@ -22,7 +22,7 @@ export const apiDomain: string = process.env.AUTHENTICATION_API_URL ?? 'http://l
 export const superTokensCoreUrl: string = process.env.SUPER_TOKENS_CORE_URL ?? 'http://localhost:3567';
 
 // Error message for duplicate third party emails
-const dubplicateEmailErrorMessage: string = 'Cannot sign up as email already exists';
+const duplicateEmailErrorMessage: string = 'Email already exists with different login method';
 
 // Configuration for super tokens
 export const SuperTokensConfig: TypeInput = {
@@ -110,7 +110,7 @@ export const SuperTokensConfig: TypeInput = {
 							}
 
 							// The email already exists with another social or email password login method, so we throw an error.
-							throw new Error(dubplicateEmailErrorMessage);
+							throw new Error(duplicateEmailErrorMessage);
 						}
 					};
 				},
@@ -121,10 +121,10 @@ export const SuperTokensConfig: TypeInput = {
 							try {
 								return await originalImplementation.thirdPartySignInUpPOST!(input);
 							} catch (err: unknown) {
-								if (err instanceof Error && err.message === dubplicateEmailErrorMessage) {
+								if (err instanceof Error && err.message === duplicateEmailErrorMessage) {
 									return {
 										status: 'GENERAL_ERROR',
-										message: 'Seems like you already have an account with another method. Please use that instead.'
+										message: duplicateEmailErrorMessage
 									};
 								}
 

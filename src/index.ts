@@ -39,6 +39,11 @@ app.get('/tenants', async (_req, res) => {
 	res.send(tenants);
 });
 
+// Health check
+app.get('/health', async (_req, res) => {
+	res.send({ status: 'UP' });
+});
+
 // Super Tokens error handling
 app.use(errorHandler());
 

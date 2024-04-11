@@ -2,6 +2,8 @@ image:
   repository: maxmorhardt/topfilms-auth-api
   tag: '1.0.0'
   pullPolicy: Always
+  replicas: 1
+  revisionHistoryLimit: 2
   env:
     - name: FRONTEND_URL
       valueFrom:
@@ -58,6 +60,20 @@ image:
         secretKeyRef:
           name: auth-env
           key: discordClientSecret
+  readinessProbe:
+    path: /health
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 30
+    failureThreshold: 5
+    successThreshold: 1
+  livenessProbe:
+    path: /health
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 30
+    failureThreshold: 5
+    successThreshold: 1
 
 service:
   type: ClusterIP
@@ -82,5 +98,5 @@ resources:
     cpu: 200m
     memory: 256Mi
   requests:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 100m
+    memory: 128Mi
