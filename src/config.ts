@@ -5,6 +5,7 @@ import Session from 'supertokens-node/recipe/session';
 import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { TypeInput } from 'supertokens-node/types';
+import { SMTPService } from 'supertokens-node/recipe/thirdpartyemailpassword/emaildelivery';
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ const applicationName = 'Top Films';
 
 // Third party provider ids
 const googleProviderId: string = 'google';
-const twitterProviderId: string = 'twitter';
+const githubProviderId: string = 'github';
 const discordProviderId: string = 'discord';
 
 // Domains based on env
@@ -37,6 +38,20 @@ export const SuperTokensConfig: TypeInput = {
 	},
 	recipeList: [
 		ThirdPartyEmailPassword.init({
+			emailDelivery: {
+				service: new SMTPService({
+					smtpSettings: {
+						host: 'smtppro.zoho.com',
+						password: process.env.EMAIL_PASSWORD ?? '',
+						port: 465,
+						from: {
+							name: 'Top Films',
+							email: 'no-reply@topfilms.io'
+						},
+						secure: true
+					}
+				})
+			},
 			providers: [
 				{
 					config: {
@@ -51,11 +66,11 @@ export const SuperTokensConfig: TypeInput = {
 				},
 				{
 					config: {
-						thirdPartyId: twitterProviderId,
+						thirdPartyId: githubProviderId,
 						clients: [
 							{
-								clientId: process.env.TWITTER_CLIENT_ID ?? '',
-								clientSecret: process.env.TWITTER_CLIENT_SECRET ?? ''
+								clientId: process.env.GITHUB_CLIENT_ID ?? '',
+								clientSecret: process.env.GITHUB_CLIENT_SECRET ?? ''
 							}
 						]
 					}

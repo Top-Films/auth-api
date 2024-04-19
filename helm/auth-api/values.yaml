@@ -40,16 +40,16 @@ image:
         secretKeyRef:
           name: auth-env
           key: googleClientSecret
-    - name: TWITTER_CLIENT_ID
+    - name: GITHUB_CLIENT_ID
       valueFrom:
         secretKeyRef:
           name: auth-env
-          key: twitterClientId
-    - name: TWITTER_CLIENT_SECRET
+          key: githubClientId
+    - name: GITHUB_CLIENT_SECRET
       valueFrom:
         secretKeyRef:
           name: auth-env
-          key: twitterClientSecret
+          key: githubClientSecret
     - name: DISCORD_CLIENT_ID
       valueFrom:
         secretKeyRef:
@@ -60,6 +60,11 @@ image:
         secretKeyRef:
           name: auth-env
           key: discordClientSecret
+    - name: EMAIL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: auth-env
+          key: emailPassword
   readinessProbe:
     path: /health
     initialDelaySeconds: 30
