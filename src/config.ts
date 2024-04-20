@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
 import supertokens from 'supertokens-node';
 import Dashboard from 'supertokens-node/recipe/dashboard';
+import EmailVerification from 'supertokens-node/recipe/emailverification';
 import Session from 'supertokens-node/recipe/session';
 import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
+import { SMTPService } from 'supertokens-node/recipe/thirdpartyemailpassword/emaildelivery';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { TypeInput } from 'supertokens-node/types';
-import { SMTPService } from 'supertokens-node/recipe/thirdpartyemailpassword/emaildelivery';
 
 dotenv.config();
 
@@ -89,7 +90,6 @@ export const SuperTokensConfig: TypeInput = {
 
 			],
 			override: {
-				// No duplicate emails
 				functions(originalImplementation) {
 					return {
 						...originalImplementation,
@@ -97,9 +97,18 @@ export const SuperTokensConfig: TypeInput = {
 							const existingUsers = await supertokens.listUsersByAccountInfo(input.tenantId, {
 								email: input.email
 							});
+
+							// This email is new so we allow sign up
 							if (existingUsers.length === 0) {
-								// This email is new so we allow sign up
-								return originalImplementation.emailPasswordSignUp(input);
+								// Sign up
+								const response = await originalImplementation.emailPasswordSignUp(input);
+								
+								// Add USER role
+								if (response.status === 'OK') {
+									await UserRoles.addRoleToUser('public', response.user.id, 'USER');
+								}
+
+								return response;
 							}
 
 							return {
@@ -110,17 +119,24 @@ export const SuperTokensConfig: TypeInput = {
 							const existingUsers = await supertokens.listUsersByAccountInfo(input.tenantId, {
 								email: input.email
 							});
+
+							// This email is new so we allow sign up
 							if (existingUsers.length === 0) {
-								// This email is new so we allow sign up
-								return originalImplementation.thirdPartySignInUp(input);
+								// Sign in/up
+								const response = await originalImplementation.thirdPartySignInUp(input);
+
+								// Add USER role
+								if (response.status === 'OK') {
+									await UserRoles.addRoleToUser('public', response.user.id, 'USER');
+								}
 							}
 
+							// Trying to sign in with the same social login. So we allow it
 							if (existingUsers.find(u =>
 								u.loginMethods.find(lM => lM.hasSameThirdPartyInfoAs({
 									id: input.thirdPartyId,
 									userId: input.thirdPartyUserId
 								}) && lM.recipeId === 'thirdparty') !== undefined)) {
-								// This means we are trying to sign in with the same social login. So we allow it
 								return originalImplementation.thirdPartySignInUp(input);
 							}
 
@@ -153,6 +169,9 @@ export const SuperTokensConfig: TypeInput = {
 		// Use bearer token instead of cookies
 		Session.init({
 			getTokenTransferMethod: () => 'header'
+		}),
+		EmailVerification.init({
+			mode: 'REQUIRED'
 		}),
 		Dashboard.init(),
 		UserRoles.init()

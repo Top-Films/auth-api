@@ -1,9 +1,10 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
-import supertokens from 'supertokens-node';
-import { errorHandler, middleware } from 'supertokens-node/framework/express';
+import supertokens, { deleteUser } from 'supertokens-node';
+import { SessionRequest, errorHandler, middleware } from 'supertokens-node/framework/express';
 import Multitenancy from 'supertokens-node/recipe/multitenancy';
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { SuperTokensConfig, apiDomain, superTokensCoreUrl, websiteDomain } from './config';
 
 dotenv.config();
@@ -37,6 +38,16 @@ app.use(middleware());
 app.get('/tenants', async (_req, res) => {
 	const tenants = await Multitenancy.listAllTenants();
 	res.send(tenants);
+});
+
+// Delete user
+app.delete('/user/:userId', verifySession(), async (req: SessionRequest, res) => {
+	if (req.params.userId !== req.session!.getUserId()) {
+		res.sendStatus(403);
+	}
+
+	await deleteUser(req.params.userId);
+	res.sendStatus(200);
 });
 
 // Health check
