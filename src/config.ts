@@ -2,9 +2,10 @@ import dotenv from 'dotenv';
 import supertokens from 'supertokens-node';
 import Dashboard from 'supertokens-node/recipe/dashboard';
 import EmailVerification from 'supertokens-node/recipe/emailverification';
+import { SMTPService as EmailVerificationSMTPService } from 'supertokens-node/recipe/emailverification/emaildelivery';
 import Session from 'supertokens-node/recipe/session';
 import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
-import { SMTPService } from 'supertokens-node/recipe/thirdpartyemailpassword/emaildelivery';
+import { SMTPService as PasswordResetSMTPService } from 'supertokens-node/recipe/thirdpartyemailpassword/emaildelivery';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { TypeInput } from 'supertokens-node/types';
 
@@ -26,6 +27,19 @@ export const superTokensCoreUrl: string = process.env.SUPER_TOKENS_CORE_URL ?? '
 // Error message for duplicate third party emails
 const duplicateEmailErrorMessage: string = 'Email already exists with different login method';
 
+const emailConfig = {
+	smtpSettings: {
+		host: 'smtppro.zoho.com',
+		password: process.env.EMAIL_PASSWORD ?? '',
+		port: 465,
+		from: {
+			name: 'Top Films',
+			email: 'no-reply@topfilms.io'
+		},
+		secure: true
+	}
+};
+
 // Configuration for super tokens
 export const SuperTokensConfig: TypeInput = {
 	supertokens: {
@@ -40,18 +54,7 @@ export const SuperTokensConfig: TypeInput = {
 	recipeList: [
 		ThirdPartyEmailPassword.init({
 			emailDelivery: {
-				service: new SMTPService({
-					smtpSettings: {
-						host: 'smtppro.zoho.com',
-						password: process.env.EMAIL_PASSWORD ?? '',
-						port: 465,
-						from: {
-							name: 'Top Films',
-							email: 'no-reply@topfilms.io'
-						},
-						secure: true
-					}
-				})
+				service: new PasswordResetSMTPService(emailConfig)
 			},
 			providers: [
 				{
@@ -171,7 +174,10 @@ export const SuperTokensConfig: TypeInput = {
 			getTokenTransferMethod: () => 'header'
 		}),
 		EmailVerification.init({
-			mode: 'REQUIRED'
+			mode: 'REQUIRED',
+			emailDelivery: {
+				service: new EmailVerificationSMTPService(emailConfig)
+			}
 		}),
 		Dashboard.init(),
 		UserRoles.init()

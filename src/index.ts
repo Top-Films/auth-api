@@ -6,6 +6,7 @@ import { SessionRequest, errorHandler, middleware } from 'supertokens-node/frame
 import Multitenancy from 'supertokens-node/recipe/multitenancy';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { SuperTokensConfig, apiDomain, superTokensCoreUrl, websiteDomain } from './config';
+import { EmailVerificationClaim } from 'supertokens-node/recipe/emailverification';
 
 dotenv.config();
 
@@ -41,14 +42,20 @@ app.get('/tenants', async (_req, res) => {
 });
 
 // Delete user
-app.delete('/user/:userId', verifySession(), async (req: SessionRequest, res) => {
-	if (req.params.userId !== req.session!.getUserId()) {
-		res.sendStatus(403);
-	}
+app.delete(
+	'/user/:userId', 
+	verifySession({
+		overrideGlobalClaimValidators: async globalValidators => globalValidators.filter(v => v.id !== EmailVerificationClaim.key)
+	}),
+	async (req: SessionRequest, res) => {
+		if (req.params.userId !== req.session!.getUserId()) {
+			res.sendStatus(403);
+		}
 
-	await deleteUser(req.params.userId);
-	res.sendStatus(200);
-});
+		await deleteUser(req.params.userId);
+		res.sendStatus(200);
+	}
+);
 
 // Health check
 app.get('/health', async (_req, res) => {
