@@ -3,10 +3,10 @@ import dotenv from 'dotenv';
 import express from 'express';
 import supertokens, { deleteUser } from 'supertokens-node';
 import { SessionRequest, errorHandler, middleware } from 'supertokens-node/framework/express';
+import { EmailVerificationClaim } from 'supertokens-node/recipe/emailverification';
 import Multitenancy from 'supertokens-node/recipe/multitenancy';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { SuperTokensConfig, apiDomain, superTokensCoreUrl, websiteDomain } from './config';
-import { EmailVerificationClaim } from 'supertokens-node/recipe/emailverification';
 
 dotenv.config();
 
@@ -36,7 +36,7 @@ app.use(
 app.use(middleware());
 
 // Create the tenants drop down when the app loads
-app.get('/tenants', async (_req, res) => {
+app.get('/tenants', async (_, res) => {
 	const tenants = await Multitenancy.listAllTenants();
 	res.send(tenants);
 });
@@ -58,7 +58,7 @@ app.delete(
 );
 
 // Health check
-app.get('/health', async (_req, res) => {
+app.get('/health', async (_, res) => {
 	res.send({ status: 'UP' });
 });
 

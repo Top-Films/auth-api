@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
 import supertokens from 'supertokens-node';
 import Dashboard from 'supertokens-node/recipe/dashboard';
+import EmailPassword from 'supertokens-node/recipe/emailpassword';
+import { SMTPService as PasswordResetSMTPService } from 'supertokens-node/recipe/emailpassword/emaildelivery';
 import EmailVerification from 'supertokens-node/recipe/emailverification';
 import { SMTPService as EmailVerificationSMTPService } from 'supertokens-node/recipe/emailverification/emaildelivery';
 import Session from 'supertokens-node/recipe/session';
-import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
-import { SMTPService as PasswordResetSMTPService } from 'supertokens-node/recipe/thirdpartyemailpassword/emaildelivery';
+import ThirdParty from 'supertokens-node/recipe/thirdparty';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { TypeInput } from 'supertokens-node/types';
 
@@ -52,73 +53,73 @@ export const SuperTokensConfig: TypeInput = {
 		websiteDomain
 	},
 	recipeList: [
-		ThirdPartyEmailPassword.init({
+		EmailPassword.init({
 			emailDelivery: {
 				service: new PasswordResetSMTPService(emailConfig)
 			},
-			providers: [
-				{
-					config: {
-						thirdPartyId: googleProviderId,
-						clients: [
-							{
-								clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-								clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ''
-							}
-						]
-					}
-				},
-				{
-					config: {
-						thirdPartyId: githubProviderId,
-						clients: [
-							{
-								clientId: process.env.GITHUB_CLIENT_ID ?? '',
-								clientSecret: process.env.GITHUB_CLIENT_SECRET ?? ''
-							}
-						]
-					}
-				},
-				{
-					config: {
-						thirdPartyId: discordProviderId,
-						clients: [
-							{
-								clientId: process.env.DISCORD_CLIENT_ID ?? '',
-								clientSecret: process.env.DISCORD_CLIENT_SECRET ?? ''
-							}
-						]
-					}
-				}
-
-			],
 			override: {
 				functions(originalImplementation) {
 					return {
 						...originalImplementation,
-						async emailPasswordSignUp(input) {
+						async signUp(input) {
 							const existingUsers = await supertokens.listUsersByAccountInfo(input.tenantId, {
 								email: input.email
 							});
 
-							// This email is new so we allow sign up
 							if (existingUsers.length === 0) {
-								// Sign up
-								const response = await originalImplementation.emailPasswordSignUp(input);
-								
-								// Add USER role
-								if (response.status === 'OK') {
-									await UserRoles.addRoleToUser('public', response.user.id, 'USER');
-								}
-
-								return response;
+								return originalImplementation.signUp(input);
 							}
 
-							return {
-								status: 'EMAIL_ALREADY_EXISTS_ERROR'
-							};
-						},
-						async thirdPartySignInUp(input) {
+							return { status: 'EMAIL_ALREADY_EXISTS_ERROR' };
+						}
+					};
+				}
+			}
+		}),
+		ThirdParty.init({
+			signInAndUpFeature: {
+				providers: [
+					{
+						config: {
+							thirdPartyId: googleProviderId,
+							clients: [
+								{
+									clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+									clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ''
+								}
+							]
+						}
+					},
+					{
+						config: {
+							thirdPartyId: githubProviderId,
+							clients: [
+								{
+									clientId: process.env.GITHUB_CLIENT_ID ?? '',
+									clientSecret: process.env.GITHUB_CLIENT_SECRET ?? ''
+								}
+							]
+						}
+					},
+					{
+						config: {
+							thirdPartyId: discordProviderId,
+							clients: [
+								{
+									clientId: process.env.DISCORD_CLIENT_ID ?? '',
+									clientSecret: process.env.DISCORD_CLIENT_SECRET ?? ''
+								}
+							]
+						}
+					}
+	
+				]
+			},
+			override: {
+				functions(originalImplementation) {
+					return {
+						...originalImplementation,
+						async signInUp(input) {
 							const existingUsers = await supertokens.listUsersByAccountInfo(input.tenantId, {
 								email: input.email
 							});
@@ -126,7 +127,7 @@ export const SuperTokensConfig: TypeInput = {
 							// This email is new so we allow sign up
 							if (existingUsers.length === 0) {
 								// Sign in/up
-								const response = await originalImplementation.thirdPartySignInUp(input);
+								const response = await originalImplementation.signInUp(input);
 
 								// Add USER role
 								if (response.status === 'OK') {
@@ -140,7 +141,7 @@ export const SuperTokensConfig: TypeInput = {
 									id: input.thirdPartyId,
 									userId: input.thirdPartyUserId
 								}) && lM.recipeId === 'thirdparty') !== undefined)) {
-								return originalImplementation.thirdPartySignInUp(input);
+								return originalImplementation.signInUp(input);
 							}
 
 							// The email already exists with another social or email password login method, so we throw an error.
@@ -151,9 +152,9 @@ export const SuperTokensConfig: TypeInput = {
 				apis(originalImplementation) {
 					return {
 						...originalImplementation,
-						async thirdPartySignInUpPOST(input) {
+						async signInUpPOST(input) {
 							try {
-								return await originalImplementation.thirdPartySignInUpPOST!(input);
+								return await originalImplementation.signInUpPOST!(input);
 							} catch (err: unknown) {
 								if (err instanceof Error && err.message === duplicateEmailErrorMessage) {
 									return {
