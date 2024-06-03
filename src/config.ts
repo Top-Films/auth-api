@@ -126,13 +126,7 @@ export const SuperTokensConfig: TypeInput = {
 
 							// This email is new so we allow sign up
 							if (existingUsers.length === 0) {
-								// Sign in/up
-								const response = await originalImplementation.signInUp(input);
-
-								// Add USER role
-								if (response.status === 'OK') {
-									await UserRoles.addRoleToUser('public', response.user.id, 'USER');
-								}
+								await originalImplementation.signInUp(input);
 							}
 
 							// Trying to sign in with the same social login. So we allow it
